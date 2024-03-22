@@ -1,38 +1,14 @@
 <?php
 
-$now = time();
-$jiris = [
-    [
-        'id' => 3,
-        'name' => 'Projet Web 2025',
-        'date' => '2025-01-19 08:30:00',
-    ],
-    [
-        'id' => 55,
-        'name' => 'Design Web 2024',
-        'date' => '2024-06-19 08:30:00',
-    ],
-    [
-        'id' => 42,
-        'name' => 'Projet Web 2024',
-        'date' => '2024-01-19 08:30:00',
-    ],
-    [
-        'id' => 80,
-        'name' => 'Design Web 2025',
-        'date' => '2025-06-19 08:30:00',
-    ],
-];
+require_once './database/database.php';
 
-$upcoming_jiris = array_filter($jiris, static function($v, $k) use ($now) {
-    $date = new DateTimeImmutable($v['date']);
-    return ($now - $date->getTimestamp()) < 0;
-}, ARRAY_FILTER_USE_BOTH);
+$db = getPDO();
 
-$finished_jiris = array_filter($jiris, static function($v, $k) use ($now) {
-    $date = new DateTimeImmutable($v['date']);
-    return ($now - $date->getTimestamp()) > 0;
-}, ARRAY_FILTER_USE_BOTH);
+$statement_finished_jiris = $db->query('SELECT * FROM jiris WHERE starting_at < CURRENT_TIMESTAMP');
+$statement_upcoming_jiris = $db->query('SELECT * FROM jiris WHERE starting_at > CURRENT_TIMESTAMP');
+
+$finished_jiris = $statement_finished_jiris->fetchAll();
+$upcoming_jiris = $statement_upcoming_jiris->fetchAll();
 
 ?>
 
@@ -63,7 +39,7 @@ $finished_jiris = array_filter($jiris, static function($v, $k) use ($now) {
                     <ol>
                         <?php foreach ($upcoming_jiris as $jiri): ?>
                             <li>
-                                <a href="/jiris/<?= $jiri['id'] ?>" class="text-blue-500 underline hover:text-blue-300"><?= $jiri['name'] ?></a>
+                                <a href="/jiris/<?= $jiri->id ?>" class="text-blue-500 underline hover:text-blue-300"><?= $jiri->name ?></a>
                             </li>
                         <?php endforeach ?>
                     </ol>
@@ -81,7 +57,7 @@ $finished_jiris = array_filter($jiris, static function($v, $k) use ($now) {
                     <ol>
                         <?php foreach ($finished_jiris as $jiri): ?>
                             <li>
-                                <a href="/jiris/<?= $jiri['id'] ?>" class="text-blue-500 underline hover:text-blue-300"><?= $jiri['name'] ?></a>
+                                <a href="/jiris/<?= $jiri->id ?>" class="text-blue-500 underline hover:text-blue-300"><?= $jiri->name ?></a>
                             </li>
                         <?php endforeach ?>
                     </ol>
